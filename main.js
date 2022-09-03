@@ -1,8 +1,8 @@
 var $ = null;
-var imageFiles = null, images = [], canvasIndex = 0, randomLongitudes = [], randomLatitudes = [];
+var imageFiles = null, images = [], canvasIndex = 0, randomLongitudes = [], randomLatitudes = [], randomMinuteSeconds = [];
 
 var datetimeFormat = 'yyyy/MM/dd HH:mm:ss';
-var previewWidth = 480
+var previewWidth = 480, maxWidth = 1024;
 var fontSize = 84, lineHeight = 56 * 2, paddingLeft = 36 * 2, paddingTop = 48 * 2, shadowOffset = 8, referenceImageWidth = 3072;
 
 var refreshCanvas = function () {
@@ -15,7 +15,7 @@ var refreshCanvas = function () {
 var clearGallery = function () {
     canvasIndex = 0;
     $('#gallery').html('');
-    $('#galleryPreview').html('');
+    $('#previewGallery').html('');
 }
 
 var drawCanvasSequentially = function () {
@@ -44,19 +44,21 @@ var drawCanvasSequentially = function () {
 var drawCanvas = function (image) {
     var canvas = document.createElement('canvas');
     canvas.id = image.id;
-    canvas.fontZoom = image.width / referenceImageWidth;
-    canvas.imageZoom = 1;
+
+    var canvasWidth = image.width > maxWidth ? maxWidth : image.width;
+    canvas.imageZoom = canvasWidth / image.width;
+    canvas.fontZoom = canvasWidth / referenceImageWidth;
 
     drawWatermark(canvas, image);
     $(canvas).appendTo('#gallery');
 
     // preview
-    var canvasPreview = document.createElement('canvas');
-    canvasPreview.fontZoom = previewWidth / referenceImageWidth;
-    canvasPreview.imageZoom = previewWidth / image.width;
+    var previewCanvas = document.createElement('canvas');
+    previewCanvas.imageZoom = previewWidth / image.width;
+    previewCanvas.fontZoom = previewWidth / referenceImageWidth;
 
-    drawWatermark(canvasPreview, image);
-    $(canvasPreview).appendTo('#galleryPreview');
+    drawWatermark(previewCanvas, image);
+    $(previewCanvas).appendTo('#previewGallery');
 
     // draw next
     canvasIndex++;
@@ -81,17 +83,18 @@ var drawText = function (canvas) {
     var context = canvas.getContext('2d');
 
     context.font = (Math.ceil(fontSize * canvas.fontZoom)) + 'px Helvetica';
-    context.shadowOffsetX = Math.ceil(shadowOffset * canvas.fontZoom);
-    context.shadowBlur = 2;
-    context.shadowColor = 'rgb(0, 0, 0, 0.5)';
+    // context.shadowOffsetX = Math.ceil(shadowOffset * canvas.fontZoom);
+    // context.shadowBlur = 2;
+    // context.shadowColor = 'rgb(0, 0, 0, 0.5)';
     context.fillStyle = 'rgb(237, 240, 245)';
+    context.strokeStyle = 'rgb(0, 0, 0, 0.5)';
     context.textBaseline = 'top';
 
     var personalCode = $('#personalCode').val();
     var siteName = $('#siteName').val();
     var longitude = $('#longitude').val() ? $('#longitude').val() + randomLongitudes[canvasIndex] : '';
     var latitude = $('#latitude').val() ? $('#latitude').val() + randomLatitudes[canvasIndex] : '';
-    var datetime = $('#datetime').val();
+    var datetime = $('#datetime').val() ? $('#datetime').val().substring(0, $('#datetime').val().length - 5) + randomMinuteSeconds[canvasIndex] : '';
     var lines = [personalCode, siteName, (longitude || latitude ? longitude + ' ' + latitude : ''), datetime]
     for (var i = 0; i < lines.length; i++) {
         var line = lines[i];
@@ -101,16 +104,23 @@ var drawText = function (canvas) {
         var x = paddingLeft * canvas.fontZoom;
         var y = (paddingTop + lineHeight * i) * canvas.fontZoom;
         context.fillText(line, x, y);
+        context.strokeText(line, x, y);
     }
 }
 
 var randomNumber = function () {
     var number;
     do {
-        number = Math.ceil(Math.random() * 999);
+        number = Math.floor(Math.random() * 1000);
     } while (number % 10 == 0)
-    var val = '000' + number;
+    var val = '00' + number;
     return val.substring(val.length - 3, val.length);
+}
+
+var randomMinuteSecond = function () {
+    var m = '0' + Math.floor(Math.random() * 60);
+    var s = '0' + Math.floor(Math.random() * 60);
+    return m.substring(m.length - 2, m.length) + ':' + s.substring(s.length - 2, s.length);
 }
 
 var download = function () {
@@ -156,9 +166,11 @@ layui.use(['laydate'], function () {
         imageFiles = e.currentTarget.files;
         randomLongitudes = [];
         randomLatitudes = [];
+        randomMinuteSeconds = [];
         for (var i = 0; i < imageFiles.length; i++) {
             randomLongitudes.push(randomNumber());
             randomLatitudes.push(randomNumber());
+            randomMinuteSeconds.push(randomMinuteSecond());
         }
         images = [];
         refreshCanvas();
