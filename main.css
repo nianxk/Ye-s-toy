@@ -10,7 +10,7 @@ div.layui-form-item {
     display: none;
 }
 
-#galleryPreview {
+#previewGallery {
     padding-left: 20px;
     max-height: 310px;
     overflow-x: hidden;
