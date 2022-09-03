@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>水印生成器</title>
+    <link rel="stylesheet" href="layui/css/layui.css">
+    <link rel="stylesheet" href="main.css">
+</head>
+
+<body style="margin: 0 auto; max-width: 1000px;">
+    <div class="layui-row">
+        <div class="layui-col-md6">
+            <div class="layui-form-item">
+                <label class="layui-form-label">个人编号</label>
+                <div class="layui-input-block">
+                    <input type="text" id="personalCode" class="layui-input" value="">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">站点</label>
+                <div class="layui-input-block">
+                    <input type="text" id="siteName" class="layui-input" value="">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">经纬度</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="longitude" class="layui-input" value="117.">
+                </div>
+                <div class="layui-input-inline" style="margin-right:0px">
+                    <input type="text" id="latitude" class="layui-input" value="31.">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">时间</label>
+                <div class="layui-input-block">
+                    <input type="text" id="datetime" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-upload">
+                    <button class="layui-btn" id="download">下载</button>
+                    <input class="layui-upload-file" type="file" id="imageDirectory" accept webkitdirectory>
+                    <button class="layui-btn" id="upload">上传</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md6">
+            <div class="layui-form-item" id="gallery">
+            </div>
+            <div class="layui-form-item" id="galleryPreview">
+            </div>
+        </div>
+
+        <script src="layui/layui.js" charset="utf-8"></script>
+        <script src="main.js" charset="utf-8"></script>
+</body>
+
+</html>
